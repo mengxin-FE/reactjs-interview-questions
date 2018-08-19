@@ -106,8 +106,38 @@ Below is a list of ReactJS interview questions and answers.
 |98 | [What is reselect?How it works?](#what-is-reselect?how-it-works)|
 |99 | [What are Redux selectors?Why use them?](#what-are-redux-selectors?why-use-them)|
 |100| [What is React Router?](#what-is-react-router)|
-
-
+|101| [How React router is different from history library?](#how-react-router-is-different-from-history-library?)|
+|102| [What are the components of React Router4?](#what-are-the-components-of-react-router4)|
+|103| [What is the purpose of push and replace methods of history?](#what-is-the-purpose-of-push-and-replace-methods-of-history)|
+|104| [How do you programmatically navigate using React router4?](#how-do-you-programmatically-navigate-using-react-router4)|
+|105| [How to get query parameters in react-router4](#how-to-get-query-parameters-in-react-router4)|
+|106| [Why you get "Router may have only one child element" warning?](#why-you-get-router-may-have-only-one-child-element-warning)|
+|107| [How to pass params with history push method in v4?](#how-to-pass-params-with-history-push-method-in-v4)|
+|108| [How to implement default page(not found page)?](#how-to-implement-default-page(not-found-page))|
+|109| [How to get history on react-router v4?](#how-to-get-history-on-react-router-v4)|
+|110| [How to perform automatic redirect after login?](#how-to-perform-automatic-redirect-after-login)|
+|111| [How to loop inside JSX?](#how-to-loop-inside-jsx)|
+|112| [How do you access props in attribute quotes?](#how-do-you-access-props-in-attribute-quotes)|
+|113| [What is React proptype array with shape?](#what-is-react-proptype-array-with-shape?)|
+|114| [How conditionally apply class attributes?](#how-conditionally-apply-class-attributes)|
+|115| [What is the difference between React and ReactDOM?](#what-is-the-difference-between-react-and-reactdom)|
+|116| [Why ReactDOM is separated from React?](#why-reactdom-is-separated-from-react)|
+|117| [How to use React label element?](#how-to-use-react-label-element?)|
+|118| [How to combine multiple inline style objects?](#how-to-combine-multiple-inline-style-objects)|
+|119| [What is the difference between setState and replaceState methods?](#what-is-the-difference-between-setstate-and-replacestate-methods)|
+|120| [How to listen state changes?](#how-to-listen-state-changes)|
+|121| [What is the recommended approach of removing an array element in react state?](#what-is-the-recommended-approach-of-removing-an-array-element-in-react-state)|
+|122| [Why fragments are better than container divs?](#why-fragments-are-better-than-container-divs)|
+|123| [What is flow?](#what-is-flow)|
+|124| [What is the difference between Flow and PropTypes?](#what-is-the-difference-between-flow-and-proptypes)|
+|125| [Is it possible to use react without rendering html?](#is-it-possible-to-use-react-without-rendering-html)|
+|126| [How to use font-awesome icons in reactjs?](#how-to-use-font-awesome-icons-in-reactjs)|
+|127| [Why dev tools is not loading in Chrome browser for local files?](#why-dev-tools-is-not-loading-in-chrome-browser-for-local-files)|
+|128| [How to do pretty printing JSON with React?](#how-to-do-pretty-printing-json-with-react)|
+|129| [Why can not you update props in react?](#why-can-not-you-update-props-in-react)|
+|130| [How to use Polymer in ReactJS?](#how-to-use-polymer-in-reactjs)|
+|131| [Can Redux only be used with React?](#can-redux-only-be-used-with-react)|
+|132| [Do you need to have a particular build tool to use Redux?](#do-you-need-to-have-a-particular-build-tool-to-use-redux)|
 
 ### What is ReactJS?
 
@@ -1564,3 +1594,397 @@ export default store;
 
 ### What is React Router?
 React Router is a powerful routing library built on top of React that helps you add new screens and flows to your application incredibly quickly, all while keeping the URL in sync with what's being displayed on the page.
+
+### How React router is different from history library?
+React Router is a wrapper around the **history** library which handles interaction with the browser's window.history with its browser and hash histories. It also provides memory history which is useful for environments that don't have global history (such as mobile app development (react-native) and unit testing with Node).
+
+### What are the components of React Router4?
+ReactRouter4 provides below 3 components
+1. <BrowserRouter>
+2. <HashRouter>
+3. <MemoryRouter>
+
+The above components will create browser, hash, and memory instances. React Router makes the properties and methods of the history instance associated with your router available through the context, under the router object.
+
+### What is the purpose of push and replace methods of history?
+A history instance has two methods for navigation purpose.
+1. Push
+2. Replace
+
+If you think of the history as an array of visited locations, push will add a new location to the array and replace will replace the current location in the array with the new one.
+
+### How do you programmatically navigate using React router4?
+There are three different ways to achieve programmatic routing/navigation within react components.
+1. **Use the withRouter higher-order component:**
+The **withRouter** HOC will inject the history object as a prop of the component. This object provides push and replace methods to avoid the usage of context.
+```
+import { withRouter } from 'react-router-dom'
+// this also works with react-router-native
+
+const Button = withRouter(({ history }) => (
+  <button
+    type='button'
+    onClick={() => { history.push('/new-location') }}
+  >
+    Click Me!
+  </button>
+))
+```
+2. **Use composition and render a <Route>**
+The <Route> component passes the same props as withRouter, so you will be able to access the history methods through the history prop.
+```
+import { Route } from 'react-router-dom'
+
+const Button = () => (
+  <Route render={({ history}) => (
+    <button
+      type='button'
+      onClick={() => { history.push('/new-location') }}
+    >
+      Click Me!
+    </button>
+  )} />
+)
+```
+3. **Using the context**
+This option is not recommended and treated as unstable API
+```
+const Button = (props, context) => (
+  <button
+    type='button'
+    onClick={() => {
+      context.history.push('/new-location'); // context.history.push === history.push
+    }}
+  >
+    Click Me!
+  </button>
+)
+// Specify the context type then it is available within the component
+Button.contextTypes = {
+  history: React.PropTypes.shape({
+    push: React.PropTypes.func.isRequired
+  })
+}
+```
+
+### How to get query parameters in react-router4?
+The ability to parse query strings was taken out of react-routerV4 because there have been user requests over the years to support different implementation. So the decision has been given to users to choose the implementation they like. The recommended approach is to use query strings library.
+```
+const queryString = require('query-string');
+const parsed = queryString.parse(props.location.search);
+```
+You can also use new URLSearchParams(plain javascript implemention) if you want something native,
+```
+const params = new URLSearchParams(props.location.search);
+const foo = params.get('name'); // sudheer
+```
+You should use polyfills for Internet Explorer11
+### Why you get "Router may have only one child element" warning?
+You have to wrap your Route's in a **Switch** block because <Switch> is unique in that it renders a route exclusively.
+At first you need to add Switch to your imports.
+```
+import { Switch, Router, Route } from 'react-router';
+```
+Define the routes with Switch block as follows,
+```
+<Router>
+  <Switch>
+    <Route ...>
+    <Route ...>
+  </Switch>
+</Router>
+```
+### How to pass params with history push method in v4?
+How to pass params with history.push in react-router v4?
+While navigating you can pass props to the history object as below
+```
+this.props.history.push({
+  pathname: '/template',
+  search: '?name=sudheer',
+  state: { detail: response.data }
+})
+```
+The search property is used to pass query params with in push method.
+### How to implement default page(not found page)?
+A **<Switch>** renders the first child **<Route>** that matches. A **<Route>** with no path always matches. So you just need to simply drop path attribute as below
+```
+<Switch>
+  <Route exact path="/" component={Home}/>
+  <Route path="/user" component={User}/>
+  <Route component={Notfound} />
+</Switch>
+```
+### How to get history on react-router v4?
+You need follow these steps to get history
+1. Create a module that exports a history object and import this module across the project. For example, create history.js file
+```
+// history.js
+import { createBrowserHistory } from 'history'
+
+export default createBrowserHistory({
+  /* pass a configuration object here if needed */
+})
+```
+2. You should use the <Router> component instead built-in routers. Imported the above history.js inside index.js file
+```
+// index.js
+import { Router } from 'react-router-dom'
+import history from './history'
+import App from './App'
+
+ReactDOM.render((
+  <Router history={history}>
+    <App />
+  </Router>
+), holder)
+```
+3. You can also use push method of history object similar to built-in history object
+ ```
+ // some-other-file.js
+ import history from './history'
+ history.push('/go-here')
+ ```
+### How to perform automatic redirect after login?
+The react-router package provides **<Redirect>** component in react-router. Rendering a <Redirect> will navigate to a new location. Like server-side redirects, the new location will override the current location in the history stack.
+```
+import React, { Component } from 'react';
+import { Redirect } from 'react-router';
+export default class LoginComponent extends Component {
+    render(){
+        if(this.state.isLoggedIn === true){
+            return (<Redirect to="/your/redirect/page" />);
+        }else{
+            return (<div>Login Please</div>);
+        }
+    }
+}
+```
+### How to loop inside JSX?
+You can simply use **map** Array method with ES6 syntax. For example, the items array iterate and returns an array of components as below
+```
+<tbody>
+  {items.map(item => <SomeComponent key={item.id} name={item.name} />)}
+</tbody>
+```
+
+You can't iterate using for loop as below,
+```
+<tbody>
+    for (var i=0; i < objects.length; i++) {
+        <SomeComponent obj={objects[i]} key={i}> // This is similar to function call in JavaScript i.e SomeComponent()
+    }
+</tbody>
+```
+### How do you access props in attribute quotes?
+ReactJS (or JSX) doesn't support variable interpolation inside an attribute value. The below representation is wrong
+```
+<img className="image" src="images/{this.props.image}" />
+```
+But  you can put any JS expression inside curly braces as the entire attribute value. So the below expression works
+```
+<img className="image" src={"images/" + this.props.image} />
+```
+### What is React proptype array with shape?
+If you want to pass an array of objects to a component with a particular shape then use React.PropTypes.shape() as an argument to React.PropTypes.arrayOf().
+```
+// an array of a particular shape.
+ReactComponent.propTypes = {
+   arrayWithShape: React.PropTypes.arrayOf(React.PropTypes.shape({
+     color: React.PropTypes.string.isRequired,
+     fontSize: React.PropTypes.number.isRequired,
+   })).isRequired,
+}
+```
+
+### How conditionally apply class attributes?
+You shouldn't use curly braces inside quotes because it is going to be evaluated as a string.
+```
+<div className="btn-panel {this.props.visible ? 'show' : 'hidden'}">
+```
+Instead you need move curly braces outside
+```
+<div className={"btn-panel " + (this.props.visible ? 'show' : 'hidden')}>
+```
+Don't forget include spaces in between classes
+### What is the difference between React and ReactDOM?
+You can use React package to define and create your elements,lifecycle hooks etc. i.e, the basic building blocks of react application. For example, the below methods comes under React package.
+```
+React.createElement, React.createClass, React.Component, React.PropTypes, React.Children
+```
+Whereas all DOM related actions performed using ReactDOM. Below are some of the use cases of ReactDOM.
+1. Mounting with render method
+```
+ReactDOM.render()
+```
+2. Use findDOMNode() method to gain direct access to a DOM element
+```
+ReactDOM.findDOMNode()
+```
+3. If the app is "isomorphic" then use renderToString() method in the backend code.
+```
+ReactDOM.renderToString()
+```
+### Why ReactDOM is separated from React?
+The React team worked on extracting all DOM-related stuff into a separate library called ReactDOM. ReactJS Version 0.14 is the first release in which the libraries are split.  By looking at some of the packages, react-native, react-art, react-canvas, and react-three, it has become clear that the beauty and essence of React has nothing to do with browsers or the DOM. To build more environments that React can render to, React team planned to split the main react package into two: react and react-dom. This paves the way to writing components that can be shared between the web version of React and React Native.
+### How to use React label element?
+If you try to render a label element bound to a text input using the standard for attribute then it produces HTML missing the required (and standard) for attribute.
+```
+<label for="user">User</label>
+<input type="text" id="user" />
+```
+Instead use htmlFor for consistency with the DOM property API. In development environment, you should have seen a warning in your console about this.
+```
+<label htmlFor="user">User</label>
+<input type="text" id="user" />
+```
+### How to combine multiple inline style objects?
+You can use spread operator in regular ReactJS
+```
+ <button style={{...styles.panel.button,...styles.panel.submitButton}}>Submit</button>
+```
+If you're using React Native then you can use the array notation
+```
+<button style={[styles.panel.button, styles.panel.submitButton]}>Submit</button>
+```
+### What is the difference between setState and replaceState methods?
+When you use **setState** the current and previous states are merged. Whereas **replaceState**, it throws out the current state, and replaces it with only what you provide. Usually setState is used unless you really need to remove keys for some reason. You can also use setting false/null instead using replaceState.
+### How to listen state changes?
+The following lifecycle methods will be called when state changes. You can use the provided arguments and the current state to determine if something meaningful changed.
+```
+componentWillUpdate(object nextProps, object nextState);
+componentDidUpdate(object prevProps, object prevState);
+```
+### What is the recommended approach of removing an array element in react state?
+The better approach is to use filter method of javascript array. For example, lets create a removeItem method for updating the state
+```
+removeItem(index) {
+  this.setState({
+    data: this.state.data.filter((item, i) => i !== index)
+  });
+}
+```
+### Why fragments are better than container divs?
+Below are the reasons why fragments recommended
+1. Fragments bit faster and has less memory usage by without creating an extra DOM node. This only has a real benefit on very large and deep trees.
+2. Some CSS mechanisms like Flexbox and CSS Grid have a special parent-child relationship, and adding divs in the middle makes it hard to keep the desired layout.
+3. The DOM inspector is less cluttered
+### What is flow?
+Flow is a static type checker, designed to find type errors in JavaScript programs, created by Facebook. Flow types can express much more fine-grained distinctions than traditional type systems. For example, Flow helps you catch errors involving null, unlike most type systems.
+### What is the difference between Flow and PropTypes?
+Flow is a static analysis tool(static checker) which uses a superset of the language, allowing you to add type annotations to all of your code and catch an entire class of bugs at compile time. PropTypes is a basic type checker(runtime checker) which has been patched onto React. It can't check anything other than the types of the props being passed to a given component. If you want more flexible typechecking for your entire project then Flow/TypeScript are appropriate choices.
+### Is it possible to use react without rendering html?
+It is possible with latest version(>=16.2). Below are the possible options
+```
+render() {
+   return false;
+}
+
+render() {
+   return null;
+}
+
+render() {
+   return [];
+}
+
+render() {
+   return <React.Fragment></React.Fragment>;
+}
+
+render() {
+   return <></>;
+}
+```
+Whereas returning undefined doesn't work.
+### How to use font-awesome icons in reactjs?
+The below steps followed to include font-awesome in ReactJS
+1. Install font-awesome
+```
+npm install --save font-awesome
+```
+2. Import font-awesome to your index.js file
+```
+import 'font-awesome/css/font-awesome.min.css';
+```
+3. Add font-awesome classes in className
+```
+ render: function() {
+    return <div><i className="fa fa-spinner">Click</i></div>;
+}
+```
+### Why dev tools is not loading in Chrome browser for local files?
+If you opened a local html file in your browser (file://...) then you must first open chrome extensions and check off "Allow access to file URLs".
+### How to do pretty printing JSON with React?
+We can use PRE tag so that the formatting of the JSON's stringify is retained
+```
+var data = { name: "sudheer", age: 30 };
+
+var User = React.createClass({
+    render: function() {
+        return <div><pre>{JSON.stringify(data, null, 2) }</pre></div>;
+    }
+});
+
+React.render(<User />, document.getElementById('container'));
+```
+### Why can not you update props in react?
+The React philosophy is that props should be immutable and top-down. This means that a parent can send whatever prop values it likes to a child, but the child cannot modify its own props.So you don't ever update your own props, or a parent's props.
+### Does the statics object work with ES6 classes in React?
+No, statics only works with React.createClass.
+```
+someComponent= React.createClass({
+statics:{
+        willTransitionFrom: function(transition,component){
+            // check any state here .
+        }
+    }
+});
+```
+But you can write statics inside ES6+ classes this way
+```
+class Component extends React.Component {
+    static propTypes = {
+    ...
+    }
+
+    static someMethod(){
+    }
+}
+```
+### How to use Polymer in ReactJS?
+Yes, it is possible. You need to follow below steps
+1. Create a polymer element.
+```
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+Polymer({
+    is: 'calender-element',
+    ready: function(){
+        this.textContent = "I am a calender";
+    }
+});
+```
+2. Make the polymer component a html tag by importing it in a html page. E.g. import it in the index.html of your react application
+```
+<link rel="import" href="./src/polymer-components/calender-element.html">
+```
+3. Use that element in the jsx file.
+```
+'use strict';
+
+import React from 'react';
+
+class MyComponent extends React.Component{
+    render(){
+        return (
+            <calender-element></calender-element>
+        );
+    }
+}
+
+export default MyComponent;
+```
+### Can Redux only be used with React?
+Redux can be used as a data store for any UI layer. The most common usage is with React and React Native, but there are bindings available for Angular, Angular 2, Vue, Mithril, and more. Redux simply provides a subscription mechanism which can be used by any other code.
+### Do you need to have a particular build tool to use Redux?
+Redux is originally written in ES6 and transpiled for production into ES5 with Webpack and Babel. You should be able to use it regardless of your JavaScript build process. Redux also offers a UMD build that can be used directly without any build process at all.
+
